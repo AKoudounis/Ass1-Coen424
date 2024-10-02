@@ -9,6 +9,13 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+# Import the generated classes
+from generated import count_laureates_by_category_pb2
+from generated import count_laureates_by_category_pb2_grpc
+from generated import count_laureates_by_keyword_pb2
+from generated import count_laureates_by_keyword_pb2_grpc
+from generated import find_laureate_by_name_pb2
+from generated import find_laureate_by_name_pb2_grpc
 
 
 # Set up logging
