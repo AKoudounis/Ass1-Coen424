@@ -5,7 +5,9 @@ import json
 import time
 import logging
 import os
-import dotenv
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # Import the generated classes
 from generated import count_laureates_by_category_pb2
