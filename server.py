@@ -62,6 +62,7 @@ class PrizeService(
         except Exception as e:
             logging.error(f"Error executing query: {str(e)}")
             context.set_details(f"Error executing query: {str(e)}")
+            context.set_code(grpc.StatusCode.INTERNAL)
             return count_laureates_by_category_pb2.CountLaureatesByCategoryResponse(total_laureates=0)
 
     def CountLaureatesByKeyword(self, request, context):
@@ -88,6 +89,7 @@ class PrizeService(
         except Exception as e:
             logging.error(f"Error executing keyword query: {str(e)}")
             context.set_details(f"Error executing keyword query: {str(e)}")
+            context.set_code(grpc.StatusCode.INTERNAL)
             return count_laureates_by_keyword_pb2.CountLaureatesByKeywordResponse(total_laureates=0)
             
     def FindLaureate(self, request, context):
