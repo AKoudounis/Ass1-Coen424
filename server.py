@@ -41,29 +41,49 @@ class PrizeService(
         )
 
     def CountLaureatesByCategory(self, request, context):
-        logging.info(f"Received request to count laureates in category: '{request.category}' from {request.start_year} to {request.end_year}")
-        try:
-            query = f"@category:{request.category} @year:[{request.start_year} {request.end_year}]"
-            logging.info(f"Executing Redis query: {query}")
+    logging.info(f"Received request to count laureates in category: '{request.category}' from {request.start_year} to {request.end_year}")
+    try:
+        query = f"@category:{request.category} @year:[{request.start_year} {request.end_year}]"
+        logging.info(f"Executing Redis query: {query}")
 
-            result = self.redis_client.execute_command("FT.SEARCH", "idx:prizes", query, "RETURN", 1, "laureates", "LIMIT", 0, 10000)
-            unique_laureate_ids = set()
+        result = self.redis_client.execute_command("FT.SEARCH", "idx:prizes", query, "RETURN", 1, "laureates", "LIMIT", 0, 10000)
+        unique_laureate_ids = set()
 
-            for i in range(1, len(result), 2):
-                laureate_data = result[i]
-                laureate_info = self.redis_client.hgetall(laureate_data)
-                motivations = json.loads(laureate_info.get('laureates', '[]'))
+        for i in range(1, len(result), 2):
+            laureate_data = result[i]
+            laureate_info = self.redis_client.hgetall(laureate_data)
+            laureates = json.loads(laureate_info.get('laureates', '[]'))
 
-                for motivation in motivations:
-                    unique_laureate_ids.add(motivation['id'])
+            for laureate in laureates:
+                laureate_id = laureate.get('id')
+                if laureate_id is None:
+                    logging.error(f"Found NoneType laureate_id in laureate: {laureate}")
+                else:
+                    unique_laureate_ids.add(laureate_id)
 
-            return count_laureates_by_category_pb2.CountLaureatesByCategoryResponse(total_laureates=len(unique_laureate_ids))
+        total_unique_laureates = len(unique_laureate_ids)
+        logging.info(f"Total unique laureates found: {total_unique_laureates}")
+        return count_laureates_by_category_pb2.CountLaureatesByCategoryResponse(total_laureates=total_unique_laureates)
+    
+    except redis.RedisError as e:
+        logging.error(f"Redis error: {str(e)}")
+        context.set_details(f"Redis error: {str(e)}")
+        context.set_code(grpc.StatusCode.INTERNAL)
+        return count_laureates_by_category_pb2.CountLaureatesByCategoryResponse(total_laureates=0)
+    
+    except json.JSONDecodeError as e:
+        logging.error(f"JSON decode error: {str(e)}")
+        context.set_details(f"JSON decode error: {str(e)}")
+        context.set_code(grpc.StatusCode.INTERNAL)
+        return count_laureates_by_category_pb2.CountLaureatesByCategoryResponse(total_laureates=0)
+    
+    except Exception as e:
+        logging.error(f"Unexpected error: {str(e)}")
+        context.set_details(f"Unexpected error: {str(e)}")
+        context.set_code(grpc.StatusCode.INTERNAL)
+        return count_laureates_by_category_pb2.CountLaureatesByCategoryResponse(total_laureates=0)
         
-        except Exception as e:
-            logging.error(f"Error executing query: {str(e)}")
-            context.set_details(f"Error executing query: {str(e)}")
-            context.set_code(grpc.StatusCode.INTERNAL)
-            return count_laureates_by_category_pb2.CountLaureatesByCategoryResponse(total_laureates=0)
+        
 
     def CountLaureatesByKeyword(self, request, context):
         query = f"@laureates:*{request.keyword}*"  # Use wildcards to match the keyword
