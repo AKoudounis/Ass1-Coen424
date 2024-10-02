@@ -52,12 +52,16 @@ class PrizeService(
             for i in range(1, len(result), 2):
                 laureate_data = result[i]
                 laureate_info = self.redis_client.hgetall(laureate_data)
-                motivations = json.loads(laureate_info.get('laureates', '[]'))
+                laureates = json.loads(laureate_info.get('laureates', '[]'))
 
-                for motivation in motivations:
-                    unique_laureate_ids.add(motivation['id'])
+                for laureate in laureates:
+                    laureate_id = laureate.get('id')
+                    if laureate_id is None:
+                        logging.error(f"Found NoneType laureate_id in laureate: {laureate}")
+                    else:
+                        unique_laureate_ids.add(laureate_id)
 
-            return count_laureates_by_category_pb2.CountLaureatesByCategoryResponse(total_laureates=len(unique_laureate_ids))
+        return count_laureates_by_category_pb2.CountLaureatesByCategoryResponse(total_laureates=len(unique_laureate_ids))
         
         except Exception as e:
             logging.error(f"Error executing query: {str(e)}")
