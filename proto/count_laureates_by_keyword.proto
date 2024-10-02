@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package prize;
+
+message CountLaureatesByKeywordRequest {
+    string keyword = 1;
+}
+
+message CountLaureatesByKeywordResponse {
+    int32 total_laureates = 1;
+}
+
+service PrizeKeywordService {
+    rpc CountLaureatesByKeyword(CountLaureatesByKeywordRequest) returns (CountLaureatesByKeywordResponse);
+}

@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package prize;
+
+message CountLaureatesByCategoryRequest {
+    string category = 1;
+    int32 start_year = 2;
+    int32 end_year = 3;
+}
+
+message CountLaureatesByCategoryResponse {
+    int32 total_laureates = 1;
+}
+
+service PrizeCategoryService {
+    rpc CountLaureatesByCategory(CountLaureatesByCategoryRequest) returns (CountLaureatesByCategoryResponse);
+}

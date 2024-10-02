@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package prize;
+
+// The request message for finding laureates by name.
+message FindLaureateByNameRequest {
+    string firstname = 1;
+    string lastname = 2;
+}
+
+// The response message for finding laureates by name.
+message FindLaureateByNameResponse {
+    repeated LaureateInfo laureates = 1;
+}
+
+// The LaureateInfo message to return details of a laureate.
+message LaureateInfo {
+    int32 year = 1;
+    string category = 2;
+    repeated string motivations = 3;
+}
+
+// The PrizeService for finding laureates by name.
+service FindLaureateByNameService {
+    rpc FindLaureate(FindLaureateByNameRequest) returns (FindLaureateByNameResponse);
+}
