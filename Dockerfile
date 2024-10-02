@@ -13,8 +13,7 @@ COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy the application code and generated files
-COPY ./generated /app/generated
-COPY ./proto /app/proto  
+COPY ./generated /app/generated 
 COPY ./server.py /app/  
 
 
