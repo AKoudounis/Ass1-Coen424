@@ -3,7 +3,7 @@
 import grpc
 import warnings
 
-import count_laureates_by_keyword_pb2 as count__laureates__by__keyword__pb2
+from generated import count_laureates_by_keyword_pb2 as count__laureates__by__keyword__pb2
 
 GRPC_GENERATED_VERSION = '1.66.2'
 GRPC_VERSION = grpc.__version__

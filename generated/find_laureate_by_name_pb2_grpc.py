@@ -3,7 +3,7 @@
 import grpc
 import warnings
 
-import find_laureate_by_name_pb2 as find__laureate__by__name__pb2
+from generated import find_laureate_by_name_pb2 as find__laureate__by__name__pb2
 
 GRPC_GENERATED_VERSION = '1.66.2'
 GRPC_VERSION = grpc.__version__
