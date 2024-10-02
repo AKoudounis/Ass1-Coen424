@@ -22,7 +22,7 @@ logging.basicConfig(level=logging.INFO)
 
 # Redis connection details from environment variables
 REDIS_HOST = os.getenv('REDIS_HOST')
-REDIS_PORT = 11112  # Default Redis port
+REDIS_PORT = os.getenv('REDIS_PORT')  # Default Redis port
 REDIS_USERNAME = os.getenv('REDIS_USERNAME')
 REDIS_PASSWORD = os.getenv('REDIS_PASSWORD')
 
