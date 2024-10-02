@@ -1,6 +1,7 @@
 # gRPC libraries
 grpcio==1.51.1
 grpcio-tools==1.51.1
+protobuf==3.20.3
 
 # Flask and Gunicorn (if you have an HTTP component)
 Flask==2.1.0
