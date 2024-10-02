@@ -12,6 +12,8 @@ WORKDIR $APP_HOME
 # Copy local code to the container image
 COPY . ./
 
+COPY ./generated /app/generated
+
 # Install production dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
