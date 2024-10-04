@@ -120,7 +120,8 @@ def serve():
     find_laureate_by_name_pb2_grpc.add_FindLaureateByNameServiceServicer_to_server(prize_service, server)
     
     # Use dynamic port assignment
-    server.add_insecure_port(f'[::]:{os.getenv("PORT", 50051)}')
+    PORT = 50051  # Set your default port here
+    server.add_secure_port(f'[::]:{PORT}', grpc.ssl_channel_credentials())
     server.start()
     logging.info("Server is running...")
 
