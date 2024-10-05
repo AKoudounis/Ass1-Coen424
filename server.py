@@ -125,7 +125,7 @@ def serve():
     count_laureates_by_keyword_pb2_grpc.add_PrizeKeywordServiceServicer_to_server(prize_service, server)
     find_laureate_by_name_pb2_grpc.add_FindLaureateByNameServiceServicer_to_server(prize_service, server)
     
-    server.add_insecure_port('0.0.0.0:50051')
+    server.add_insecure_port('[::]:50051')
 
     server.start()
     logging.info("Server is running on port 50051...")
