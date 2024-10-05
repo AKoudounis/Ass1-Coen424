@@ -11,13 +11,9 @@ charset-normalizer
 click
 colorama
 configobj
-cryptography
 docutils
 filelock
 fire
-Flask
-Flask-Cors
-Flask-RESTful
 flatbuffers
 gast
 gdown
@@ -28,12 +24,9 @@ gunicorn
 h11
 h5py
 idna
-isodate
-itsdangerous
 Jinja2
 jmespath
 joblib
-keras
 libclang
 Markdown
 markdown-it-py
@@ -76,7 +69,6 @@ setuptools
 six
 sniffio
 sortedcontainers
-soupsieve
 tensorboard
 tensorboard-data-server
 termcolor
