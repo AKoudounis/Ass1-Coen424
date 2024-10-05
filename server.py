@@ -43,6 +43,13 @@ class PrizeService(
     def CountLaureatesByCategory(self, request, context):
         logging.info(f"Received request to count laureates in category: '{request.category}' from {request.start_year} to {request.end_year}")
         try:
+            # Validate request parameters
+            if request.start_year is None or request.end_year is None:
+                logging.error("start_year and end_year cannot be None.")
+                context.set_details("start_year and end_year cannot be None.")
+                context.set_code(grpc.StatusCode.INVALID_ARGUMENT)
+                return count_laureates_by_category_pb2.CountLaureatesByCategoryResponse(total_laureates=0)
+
             query = f"@category:{request.category} @year:[{request.start_year} {request.end_year}]"
             logging.info(f"Executing Redis query: {query}")
 
@@ -57,7 +64,9 @@ class PrizeService(
                 for motivation in motivations:
                     unique_laureate_ids.add(motivation['id'])
 
-            return count_laureates_by_category_pb2.CountLaureatesByCategoryResponse(total_laureates=len(unique_laureate_ids))
+            total_laureates = len(unique_laureate_ids)
+            logging.info(f"Total unique laureates found: {total_laureates}")
+            return count_laureates_by_category_pb2.CountLaureatesByCategoryResponse(total_laureates=total_laureates)
         
         except Exception as e:
             logging.error(f"Error executing query: {str(e)}")
@@ -66,6 +75,13 @@ class PrizeService(
             return count_laureates_by_category_pb2.CountLaureatesByCategoryResponse(total_laureates=0)
 
     def CountLaureatesByKeyword(self, request, context):
+        logging.info(f"Received request to count laureates by keyword: '{request.keyword}'")
+        if not request.keyword:
+            logging.error("Keyword cannot be empty.")
+            context.set_details("Keyword cannot be empty.")
+            context.set_code(grpc.StatusCode.INVALID_ARGUMENT)
+            return count_laureates_by_keyword_pb2.CountLaureatesByKeywordResponse(total_laureates=0)
+
         query = f"@laureates:*{request.keyword}*"  # Use wildcards to match the keyword
         logging.info(f"Executing Redis query: {query}")
         
@@ -93,6 +109,14 @@ class PrizeService(
             return count_laureates_by_keyword_pb2.CountLaureatesByKeywordResponse(total_laureates=0)
             
     def FindLaureate(self, request, context):
+        logging.info(f"Searching for laureate: {request.firstname} {request.lastname}")
+        
+        if not request.firstname or not request.lastname:
+            logging.error("Firstname and lastname cannot be empty.")
+            context.set_details("Firstname and lastname cannot be empty.")
+            context.set_code(grpc.StatusCode.INVALID_ARGUMENT)
+            return find_laureate_by_name_pb2.FindLaureateByNameResponse(laureates=[])
+
         query = f"@laureates:*{request.firstname}* @laureates:*{request.lastname}*"
         result = self.redis_client.execute_command("FT.SEARCH", "idx:prizes", query, "RETURN", 3, "year", "category", "laureates")
         
@@ -102,8 +126,11 @@ class PrizeService(
             laureate_data = self.redis_client.hgetall(laureate_key)
             motivations = json.loads(laureate_data.get('laureates', '[]'))
             matching_motivations = [m['motivation'].strip('"') for m in motivations if m['surname'].lower() == request.lastname.lower()]
+            
+            # Make sure the year is an integer
+            year = int(laureate_data.get('year', 0))  # Default to 0 if year is None
             laureates_info.append(find_laureate_by_name_pb2.LaureateInfo(
-                year=int(laureate_data.get('year')),
+                year=year,
                 category=laureate_data.get('category'),
                 motivations=matching_motivations
             ))
